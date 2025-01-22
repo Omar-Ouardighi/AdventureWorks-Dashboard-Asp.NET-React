@@ -1,0 +1,18 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: always
+    hostname: omar-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=yourStrong(!)Password
+      - MSSQL_PID=Developer
+      - MSSQL_BACKUP_DIR=/var/opt/mssql/backups
+      - MSSQL_LCID=1033
+      - TZ=Etc/UTC
+    ports:
+      - 1433:1433   
+    volumes:
+      # - ./init-scripts:/tmp/init-scripts
+      - ./sqlserver:/var/opt/mssql/backups
+    
