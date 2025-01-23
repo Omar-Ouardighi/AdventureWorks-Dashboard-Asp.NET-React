@@ -5,9 +5,20 @@ using Server.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 var connString = builder.Configuration.GetConnectionString("AdventureWorks");
+
+var MyAllowSpecificOrigins = "http://localhost:5173";
 builder.Services.AddDbContext<AdventureWorksLt2022Context>(options =>
     options.UseSqlServer(connString));
-
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(MyAllowSpecificOrigins,
+            builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+    });
 
 var app = builder.Build();
 
@@ -62,5 +73,6 @@ app.MapGet("/product-subcategory-sales", async (AdventureWorksLt2022Context cont
 });
 
 
+app.UseCors(MyAllowSpecificOrigins);
 
 app.Run();
