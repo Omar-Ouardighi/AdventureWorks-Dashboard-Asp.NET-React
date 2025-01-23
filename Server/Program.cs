@@ -17,12 +17,11 @@ app.MapGet("/kpis", async (AdventureWorksLt2022Context context) =>
     var totalSales = await context.SalesOrderDetails.SumAsync(s => s.LineTotal);
     var totalOrders = await context.SalesOrderDetails.SumAsync(s => s.OrderQty);
 
-    var Kpis = new KpisDto()
-    {
-        TotalSales = Math.Round(totalSales, 2),
-        TotalOrderQuantity = totalOrders,
-        AverageMoneySpent = Math.Round(totalSales / totalOrders, 2)
-    };
+    var Kpis = new KpisDto(
+        Math.Round(totalSales, 2),
+        totalOrders,
+        Math.Round(totalSales / totalOrders, 2)
+    );
     
     return Results.Ok(Kpis);
 });
@@ -36,16 +35,32 @@ app.MapGet("/product-category-sales", async (AdventureWorksLt2022Context context
                 join p in context.Products on c.ProductCategoryId equals p.ProductCategoryId
                 join d in context.SalesOrderDetails on p.ProductId equals d.ProductId
                 group d by new { s.ParentProductCategoryName} into g
-                select new ProductCategorySalesDto
-                {
-                    
-                    CategoryName = g.Key.ParentProductCategoryName,
-                    TotalAmount = g.Sum(x => x.LineTotal)
-                };
+                select new ProductCategorySalesDto(
+                
+                    g.Key.ParentProductCategoryName,
+                    g.Sum(x => x.LineTotal)
+                );
 
-    var result = await query.OrderBy(x => x.TotalAmount).ToListAsync();
+    var result = (await query.ToListAsync()).OrderByDescending(x => x.TotalAmount).ToList();
     return Results.Ok(result);
 });
+
+// GET sales data by product subcategory.
+app.MapGet("/product-subcategory-sales", async (AdventureWorksLt2022Context context) =>
+{
+    var query = from c in context.ProductCategories
+                join p in context.Products on c.ProductCategoryId equals p.ProductCategoryId
+                join d in context.SalesOrderDetails on p.ProductId equals d.ProductId
+                group d by new { c.Name } into g
+                select new ProductCategorySalesDto(
+                    g.Key.Name,
+                    g.Sum(x => x.LineTotal)
+                );
+
+    var result = (await query.ToListAsync()).OrderByDescending(x => x.TotalAmount).ToList();
+    return Results.Ok(result);
+});
+
 
 
 app.Run();

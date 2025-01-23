@@ -1,8 +1,8 @@
-namespace Server.Dtos
-{
-    public class ProductCategorySalesDto
-    {
-        public required string CategoryName { get; set; }
-        public decimal TotalAmount { get; set; }
-    }
-}
+namespace Server.Dtos;
+
+public record class ProductCategorySalesDto
+(
+        string CategoryName,
+        decimal TotalAmount
+);
+       
