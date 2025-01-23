@@ -26,20 +26,6 @@ app.MapGet("/kpis", async (AdventureWorksLt2022Context context) =>
     return Results.Ok(Kpis);
 });
 
-// Get a single ProductModel by ID
-app.MapGet("/productmodels/{id:int}", async (int id, AdventureWorksLt2022Context context) =>
-{
-    var productModel = await context.ProductModels
-        .Include(p => p.ProductModelProductDescriptions)
-        .Include(p => p.Products)
-        .FirstOrDefaultAsync(p => p.ProductModelId == id);
 
-    if (productModel == null)
-    {
-        return Results.NotFound(new { message = "ProductModel not found" });
-    }
-
-    return Results.Ok(productModel);
-});
 
 app.Run();
