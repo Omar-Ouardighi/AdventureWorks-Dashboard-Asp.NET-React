@@ -1,34 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+
 import './App.css'
+import KpiCard from './components/KpiCard'
+
+interface KPIData {
+  totalSales: number;
+  totalOrderQuantity:number;
+  averageMoneySpent:number
+}
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [kpiData, setKpiData] = useState<KPIData | null>(null);
 
+  useEffect(() => {
+    const fetchKPIs = async () => {
+      try {
+        const response = await fetch('http://localhost:5147/kpis');
+        const data = await response.json();
+        setKpiData(data);
+      } catch (error) {
+        console.error('Error fetching KPI data:', error);
+      }
+    };
+
+    fetchKPIs();
+  }, []);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className='min-h-screen'>
+      <div className="flex flex-col sm:flex-row justify-between gap-10">
+        {kpiData && (
+          <>
+        <KpiCard
+          title="Total Sales"
+          value={`$${kpiData.totalSales.toFixed(2)}`}
+        />
+        
+        <KpiCard
+          title="Total Order Quantity"
+          value={kpiData.totalOrderQuantity.toLocaleString()}
+        />
+        
+        <KpiCard
+          title="Average Money Spent"
+          value={`$${kpiData.averageMoneySpent.toFixed(2)}`}
+        />
+          </>
+        )}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 

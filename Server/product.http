@@ -1,0 +1,7 @@
+GET http://localhost:5147/kpis
+
+###
+GET http://localhost:5147/product-category-sales
+
+###
+GET http://localhost:5147/product-subcategory-sales
